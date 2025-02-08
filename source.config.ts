@@ -1,9 +1,4 @@
-import {
-  defineConfig,
-  defineDocs,
-  frontmatterSchema,
-  metaSchema,
-} from "fumadocs-mdx/config";
+import { defineConfig, defineDocs } from "fumadocs-mdx/config";
 import { transformerTwoslash } from "fumadocs-twoslash";
 import remarkMath from "remark-math";
 import {
@@ -16,13 +11,6 @@ import rehypeKatex from "rehype-katex";
 
 export const { docs, meta } = defineDocs({
   dir: "content/courses",
-  docs: {
-    async: true,
-    schema: frontmatterSchema.extend({}),
-  },
-  meta: {
-    schema: metaSchema.extend({}),
-  },
 });
 
 export default defineConfig({

@@ -30,7 +30,9 @@ export default async function Page(props: {
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const { body: Mdx, toc, lastModified } = await page.data.load();
+  const Mdx = page.data.body;
+  const toc = page.data.toc;
+  const lastModified = page.data.lastModified;
 
   return (
     <DocsPage
