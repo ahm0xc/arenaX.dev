@@ -9,7 +9,6 @@ import { createMetadata } from "~/lib/metadata";
 import { baseUrl } from "~/lib/utils";
 
 import "./global.css";
-import "katex/dist/katex.min.css";
 
 export const metadata = createMetadata({
   title: {

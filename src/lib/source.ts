@@ -3,7 +3,7 @@ import { loader } from "fumadocs-core/source";
 import { createElement } from "react";
 
 import { docs, meta } from "~/../.source";
-import { icons } from "~/components/icons";
+import { Icons } from "~/components/icons";
 
 export const source = loader({
   baseUrl: "/course",
@@ -14,6 +14,6 @@ export const source = loader({
       return;
     }
 
-    if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
+    if (icon in Icons) return createElement(Icons[icon as keyof typeof Icons]);
   },
 });

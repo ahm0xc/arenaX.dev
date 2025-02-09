@@ -1,7 +1,25 @@
 import { icons as lucideIcons, LucideProps } from "lucide-react";
 
-export const icons = {
+import { cn } from "~/lib/utils";
+
+export const Icons = {
   ...lucideIcons,
+  logo: ({ className, ...props }: LucideProps) => (
+    <svg
+      width="547"
+      height="426"
+      viewBox="0 0 547 426"
+      fill="none"
+      className={cn("w-6 h-6 text-white", className)}
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M0.5 157V263.5C-1.5 285.1 10 301.167 16 306.5C36.1667 327.667 81.7 375.3 102.5 396.5C118.9 417.7 141 425 150 426H315C283.167 392.833 216.7 323.2 205.5 310C198.3 295.6 208.5 291 214.5 290.5H348C365.2 290.5 386.833 278.167 395.5 272L547 153.5H383C364.2 152.7 344.5 165.833 337 172.5C295.333 205.5 209.4 273.3 199 280.5C193.4 287.7 178.667 290.167 172 290.5H32.5C18.5 285.7 23 273.5 27 268L370.5 1.00002H172C156.8 -1.39998 135.667 12 127 19C116 27.8334 84.6 53 47 83C4.2 109.4 -1.83333 143.333 0.5 157Z"
+        fill="currentColor"
+      />
+    </svg>
+  ),
   Html: (props: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
