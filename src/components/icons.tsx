@@ -10,7 +10,7 @@ export const Icons = {
       height="426"
       viewBox="0 0 547 426"
       fill="none"
-      className={cn("w-6 h-6 text-white", className)}
+      className={cn("w-6 h-6", className)}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
