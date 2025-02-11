@@ -7,6 +7,7 @@ import Editor, {
   type OnMount,
 } from "@monaco-editor/react";
 import { PlayIcon, SettingsIcon } from "lucide-react";
+import type { PyodideInterface } from "pyodide";
 
 import {
   ResizableHandle,
@@ -128,7 +129,7 @@ function DocumentArea() {
   );
 }
 
-const code = `# Solution
+const initialCode = `# Solution
 def two_sum(nums, target):
     for i in range(len(nums)):
         for j in range(i + 1, len(nums)):
@@ -137,15 +138,47 @@ def two_sum(nums, target):
 `;
 
 function EditorArea() {
+  const [code, setCode] = React.useState(initialCode);
   const editorRef = React.useRef<Parameters<OnMount>[0]>(null);
+  const [output, setOutput] = React.useState("");
+  console.log("🚀 ~ EditorArea ~ output:", output);
+  const [loading, setLoading] = React.useState(true);
+  console.log("🚀 ~ EditorArea ~ loading:", loading);
+  const pyodide = React.useRef<PyodideInterface | null>(null);
+
   const monaco = useMonaco();
 
   const handleEditorChange: OnChange = (value) => {
-    console.log(value);
+    setCode(value || "");
   };
 
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor;
+  };
+
+  const runCode = async () => {
+    if (!pyodide) return;
+
+    try {
+      setOutput("");
+
+      pyodide.current?.runPython(`
+        import sys
+        from io import StringIO
+        sys.stdout = StringIO()
+      `);
+
+      await pyodide.current?.runPythonAsync(code);
+
+      const stdout = pyodide.current?.runPython("sys.stdout.getvalue()");
+      setOutput(stdout);
+
+      pyodide.current?.runPython("sys.stdout = sys.__stdout__");
+    } catch (error) {
+      setOutput(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    }
   };
 
   React.useEffect(() => {
@@ -368,6 +401,36 @@ function EditorArea() {
     }
   }, [monaco]);
 
+  React.useEffect(() => {
+    const loadPyodideScript = () => {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+        script.async = true;
+        script.onload = () => resolve((window as any).loadPyodide);
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    };
+
+    const initPyodide = async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loadPyodide: any = await loadPyodideScript();
+        const pyodideInstance = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
+        });
+        pyodide.current = pyodideInstance;
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to load Pyodide:", error);
+        setOutput("Error: Failed to load Python environment");
+      }
+    };
+
+    initPyodide();
+  }, []);
+
   return (
     <div className="h-full p-2 flex flex-col">
       <div className="rounded-t-xl bg-secondary/80 border-b min-h-10 h-10 flex items-center justify-between px-4">
@@ -375,6 +438,9 @@ function EditorArea() {
           <Icons.Python className="w-4 h-4" />
           <span className="text-sm font-medium">index.py</span>
         </div>
+        <Button variant="secondary" onClick={runCode}>
+          Run
+        </Button>
       </div>
       <div className="flex-1">
         <Editor
@@ -387,6 +453,12 @@ function EditorArea() {
               enabled: false,
             },
             fontSize: 18,
+            lineNumbers: "on",
+            rulers: [],
+            wordWrap: "off",
+            folding: true,
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
           }}
         />
       </div>

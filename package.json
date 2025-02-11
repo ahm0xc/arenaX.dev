@@ -32,6 +32,7 @@
     "next": "15.1.6",
     "oxc-transform": "^0.48.1",
     "postcss": "^8.5.1",
+    "pyodide": "^0.27.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^9.0.3",
