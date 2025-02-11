@@ -6,6 +6,7 @@ import Editor, {
   type OnChange,
   type OnMount,
 } from "@monaco-editor/react";
+import { PlayIcon, SettingsIcon } from "lucide-react";
 
 import {
   ResizableHandle,
@@ -15,7 +16,8 @@ import {
 import { Icons } from "~/components/icons";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { PlayIcon, SettingsIcon } from "lucide-react";
+import { Markdown } from "~/components/markdown";
+import { Badge } from "~/components/ui/badge";
 
 export default function Exercises() {
   return (
@@ -61,28 +63,78 @@ function Header() {
       <div className="flex items-center gap-2 bg-secondary rounded-full p-1 pr-3">
         <img
           src="https://github.com/shadcn.png"
-          className="w-8 h-8 rounded-full"
+          className="w-7 h-7 rounded-full"
         />
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-secondary-foreground">
+          <span className="text-[12px] font-medium text-secondary-foreground">
             Ahmed
           </span>
-          <span className="text-xs text-secondary-foreground/80">@ahm0xc</span>
+          <span className="text-[10px] text-secondary-foreground/80">
+            @ahm0xc
+          </span>
         </div>
       </div>
     </div>
   );
 }
 
+const markdown = `Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to \`target\`.
+
+You may assume that each input would have **exactly** one solution, and you may not use the same element twice.
+
+**Example 1:**
+
+\`\`\`python
+nums = [2, 7, 11, 15]
+target = 9
+
+Output: [0, 1]
+\`\`\`
+
+**Example 2:**
+
+\`\`\`python
+nums = [3, 2, 4]
+target = 6
+
+Output: [1, 2]
+\`\`\`
+
+## Constraints
+
+- 2 <= nums.length <= 10^4
+- -10^9 <= nums[i] <= 10^9
+- -10^9 <= target <= 10^9
+- Only one valid answer exists.
+
+**Follow up:** Can you come up with an algorithm that is less than O(n^2) time complexity?
+`;
+
 function DocumentArea() {
   return (
     <div className="flex h-full flex-col p-2">
-      <div className="bg-secondary/80 rounded-t-xl border-b h-10"></div>
-      <div className="flex-1 bg-[#0c0c0c]"></div>
-      <div className="bg-secondary/80 rounded-b-xl border-t h-10"></div>
+      <div className="bg-secondary/80 rounded-t-xl border-b min-h-10 h-10"></div>
+      <div className="flex-1 bg-[#0c0c0c] overflow-y-scroll p-4">
+        <div className="flex flex-col gap-2 mb-8">
+          <h1 className="text-2xl font-bold">11. Two Sum</h1>
+          <div>
+            <Badge variant="default">Easy</Badge>
+          </div>
+        </div>
+        <Markdown>{markdown}</Markdown>
+      </div>
+      <div className="bg-secondary/80 rounded-b-xl border-t min-h-10 h-10"></div>
     </div>
   );
 }
+
+const code = `# Solution
+def two_sum(nums, target):
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] + nums[j] == target:
+                return [i, j]
+`;
 
 function EditorArea() {
   const editorRef = React.useRef<Parameters<OnMount>[0]>(null);
@@ -327,7 +379,7 @@ function EditorArea() {
       <div className="flex-1">
         <Editor
           defaultLanguage="python"
-          defaultValue="# some comment"
+          defaultValue={code}
           onMount={handleEditorMount}
           onChange={handleEditorChange}
           options={{
