@@ -407,6 +407,7 @@ function EditorArea() {
         const script = document.createElement("script");
         script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
         script.async = true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         script.onload = () => resolve((window as any).loadPyodide);
         script.onerror = reject;
         document.head.appendChild(script);

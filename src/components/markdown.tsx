@@ -34,7 +34,8 @@ export function Markdown({ children }: { children: string }) {
         "prose-h4:text-foreground prose-h4:text-base prose-h4:font-normal prose-h4:mb-1",
         "prose-h5:text-foreground prose-h5:text-sm prose-h5:font-normal prose-h5:mb-1",
         "prose-h6:text-foreground prose-h6:text-xs prose-h6:font-normal prose-h6:mb-1",
-        "prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0"
+        "prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0",
+        "prose-code:border-none"
       )}
       components={{
         // @ts-expect-error ...
