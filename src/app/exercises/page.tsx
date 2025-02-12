@@ -1,13 +1,12 @@
 "use client";
 
-import * as React from "react";
-import Editor, {
-  useMonaco,
-  type OnChange,
-  type OnMount,
-} from "@monaco-editor/react";
-import { PlayIcon, SettingsIcon } from "lucide-react";
-import type { PyodideInterface } from "pyodide";
+import {
+  ChartNoAxesColumnIcon,
+  SettingsIcon,
+  TerminalIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { create } from "zustand";
 
 import {
   ResizableHandle,
@@ -15,10 +14,20 @@ import {
   ResizablePanelGroup,
 } from "~/components/ui/resizable";
 import { Icons } from "~/components/icons";
-import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Markdown } from "~/components/markdown";
 import { Badge } from "~/components/ui/badge";
+import PythonEditor from "./_components/python-editor";
+
+interface ExerciseStore {
+  result: { output: string | null; error: string | null };
+  setResult: (result: { output: string | null; error: string | null }) => void;
+}
+
+export const useExerciseStore = create<ExerciseStore>((set) => ({
+  result: { output: null, error: null },
+  setResult: (result) => set({ result }),
+}));
 
 export default function Exercises() {
   return (
@@ -29,9 +38,16 @@ export default function Exercises() {
           <ResizablePanel defaultSize={40} minSize={25}>
             <DocumentArea />
           </ResizablePanel>
-          <ResizableHandle className="bg-transparent" />
+          <ResizableHandle className="bg-transparent" withHandle />
           <ResizablePanel defaultSize={60} minSize={25}>
-            <EditorArea />
+            <ResizablePanelGroup direction="vertical">
+              <ResizablePanel defaultSize={70}>
+                <EditorArea />
+              </ResizablePanel>
+              <ResizablePanel defaultSize={30} minSize={30} maxSize={30}>
+                <OutputArea />
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
@@ -53,8 +69,8 @@ function Header() {
       </div>
       <div className="flex items-center justify-center">
         <Button variant="secondary" className="rounded-r-none gap-2" size="sm">
-          <PlayIcon className="w-4 h-4" />
-          Run
+          <ChartNoAxesColumnIcon className="w-4 h-4" />
+          Leaderboard
         </Button>
         <Button variant="secondary" className="rounded-l-none gap-2" size="sm">
           <SettingsIcon className="w-4 h-4" />
@@ -135,339 +151,41 @@ def two_sum(nums, target):
         for j in range(i + 1, len(nums)):
             if nums[i] + nums[j] == target:
                 return [i, j]
+
+print(two_sum([2, 7, 11, 15], 9))
+print(two_sum([3, 2, 4], 6))
 `;
 
 function EditorArea() {
-  const [code, setCode] = React.useState(initialCode);
-  const editorRef = React.useRef<Parameters<OnMount>[0]>(null);
-  const [output, setOutput] = React.useState("");
-  console.log("🚀 ~ EditorArea ~ output:", output);
-  const [loading, setLoading] = React.useState(true);
-  console.log("🚀 ~ EditorArea ~ loading:", loading);
-  const pyodide = React.useRef<PyodideInterface | null>(null);
+  const { setResult } = useExerciseStore();
+  return <PythonEditor initialCode={initialCode} onResult={setResult} />;
+}
 
-  const monaco = useMonaco();
-
-  const handleEditorChange: OnChange = (value) => {
-    setCode(value || "");
-  };
-
-  const handleEditorMount: OnMount = (editor) => {
-    editorRef.current = editor;
-  };
-
-  const runCode = async () => {
-    if (!pyodide) return;
-
-    try {
-      setOutput("");
-
-      pyodide.current?.runPython(`
-        import sys
-        from io import StringIO
-        sys.stdout = StringIO()
-      `);
-
-      await pyodide.current?.runPythonAsync(code);
-
-      const stdout = pyodide.current?.runPython("sys.stdout.getvalue()");
-      setOutput(stdout);
-
-      pyodide.current?.runPython("sys.stdout = sys.__stdout__");
-    } catch (error) {
-      setOutput(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    }
-  };
-
-  React.useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme("dracula", {
-        base: "vs-dark",
-        inherit: true,
-        rules: [
-          {
-            background: "0c0c0c",
-            token: "",
-          },
-          {
-            foreground: "6e6e6e",
-            token: "comment",
-          },
-          {
-            foreground: "f1fa8c",
-            token: "string",
-          },
-          {
-            foreground: "bd93f9",
-            token: "constant.numeric",
-          },
-          {
-            foreground: "bd93f9",
-            token: "constant.language",
-          },
-          {
-            foreground: "bd93f9",
-            token: "constant.character",
-          },
-          {
-            foreground: "bd93f9",
-            token: "constant.other",
-          },
-          {
-            foreground: "ffb86c",
-            token: "variable.other.readwrite.instance",
-          },
-          {
-            foreground: "ff79c6",
-            token: "constant.character.escaped",
-          },
-          {
-            foreground: "ff79c6",
-            token: "constant.character.escape",
-          },
-          {
-            foreground: "ff79c6",
-            token: "string source",
-          },
-          {
-            foreground: "ff79c6",
-            token: "string source.ruby",
-          },
-          {
-            foreground: "ff79c6",
-            token: "keyword",
-          },
-          {
-            foreground: "ff79c6",
-            token: "storage",
-          },
-          {
-            foreground: "8be9fd",
-            fontStyle: "italic",
-            token: "storage.type",
-          },
-          {
-            foreground: "50fa7b",
-            fontStyle: "underline",
-            token: "entity.name.class",
-          },
-          {
-            foreground: "50fa7b",
-            fontStyle: "italic underline",
-            token: "entity.other.inherited-class",
-          },
-          {
-            foreground: "50fa7b",
-            token: "entity.name.function",
-          },
-          {
-            foreground: "ffb86c",
-            fontStyle: "italic",
-            token: "variable.parameter",
-          },
-          {
-            foreground: "ff79c6",
-            token: "entity.name.tag",
-          },
-          {
-            foreground: "50fa7b",
-            token: "entity.other.attribute-name",
-          },
-          {
-            foreground: "8be9fd",
-            token: "support.function",
-          },
-          {
-            foreground: "6be5fd",
-            token: "support.constant",
-          },
-          {
-            foreground: "66d9ef",
-            fontStyle: " italic",
-            token: "support.type",
-          },
-          {
-            foreground: "66d9ef",
-            fontStyle: " italic",
-            token: "support.class",
-          },
-          {
-            foreground: "f8f8f0",
-            background: "ff79c6",
-            token: "invalid",
-          },
-          {
-            foreground: "f8f8f0",
-            background: "bd93f9",
-            token: "invalid.deprecated",
-          },
-          {
-            foreground: "cfcfc2",
-            token: "meta.structure.dictionary.json string.quoted.double.json",
-          },
-          {
-            foreground: "6e6e6e",
-            token: "meta.diff",
-          },
-          {
-            foreground: "6e6e6e",
-            token: "meta.diff.header",
-          },
-          {
-            foreground: "ff79c6",
-            token: "markup.deleted",
-          },
-          {
-            foreground: "50fa7b",
-            token: "markup.inserted",
-          },
-          {
-            foreground: "e6db74",
-            token: "markup.changed",
-          },
-          {
-            foreground: "bd93f9",
-            token: "constant.numeric.line-number.find-in-files - match",
-          },
-          {
-            foreground: "e6db74",
-            token: "entity.name.filename",
-          },
-          {
-            foreground: "f83333",
-            token: "message.error",
-          },
-          {
-            foreground: "eeeeee",
-            token:
-              "punctuation.definition.string.begin.json - meta.structure.dictionary.value.json",
-          },
-          {
-            foreground: "eeeeee",
-            token:
-              "punctuation.definition.string.end.json - meta.structure.dictionary.value.json",
-          },
-          {
-            foreground: "8be9fd",
-            token: "meta.structure.dictionary.json string.quoted.double.json",
-          },
-          {
-            foreground: "f1fa8c",
-            token:
-              "meta.structure.dictionary.value.json string.quoted.double.json",
-          },
-          {
-            foreground: "50fa7b",
-            token:
-              "meta meta meta meta meta meta meta.structure.dictionary.value string",
-          },
-          {
-            foreground: "ffb86c",
-            token:
-              "meta meta meta meta meta meta.structure.dictionary.value string",
-          },
-          {
-            foreground: "ff79c6",
-            token: "meta meta meta meta meta.structure.dictionary.value string",
-          },
-          {
-            foreground: "bd93f9",
-            token: "meta meta meta meta.structure.dictionary.value string",
-          },
-          {
-            foreground: "50fa7b",
-            token: "meta meta meta.structure.dictionary.value string",
-          },
-          {
-            foreground: "ffb86c",
-            token: "meta meta.structure.dictionary.value string",
-          },
-        ],
-        colors: {
-          "editor.foreground": "#f8f8f2",
-          "editor.background": "#0c0c0c",
-          "editor.selectionBackground": "#212121",
-          "editor.lineHighlightBackground": "#212121",
-          "editorCursor.foreground": "#f8f8f0",
-          "editorWhitespace.foreground": "#3B3A32",
-          "editorIndentGuide.activeBackground": "#9D550FB0",
-          "editor.selectionHighlightBorder": "#222218",
-        },
-      });
-
-      monaco.editor.setTheme("dracula");
-    }
-  }, [monaco]);
-
-  React.useEffect(() => {
-    const loadPyodideScript = () => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
-        script.async = true;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        script.onload = () => resolve((window as any).loadPyodide);
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    };
-
-    const initPyodide = async () => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const loadPyodide: any = await loadPyodideScript();
-        const pyodideInstance = await loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
-        });
-        pyodide.current = pyodideInstance;
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to load Pyodide:", error);
-        setOutput("Error: Failed to load Python environment");
-      }
-    };
-
-    initPyodide();
-  }, []);
-
+function OutputArea() {
+  const { result } = useExerciseStore();
   return (
-    <div className="h-full p-2 flex flex-col">
-      <div className="rounded-t-xl bg-secondary/80 border-b min-h-10 h-10 flex items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <Icons.Python className="w-4 h-4" />
-          <span className="text-sm font-medium">index.py</span>
+    <div className="flex h-full flex-col p-2">
+      <div className="bg-secondary/80 rounded-t-xl border-b min-h-10 h-10">
+        <div className="h-full flex items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <TerminalIcon className="w-4 h-4" />
+            <span className="text-sm font-medium">output</span>
+          </div>
         </div>
-        <Button variant="secondary" onClick={runCode}>
-          Run
-        </Button>
       </div>
-      <div className="flex-1">
-        <Editor
-          defaultLanguage="python"
-          defaultValue={code}
-          onMount={handleEditorMount}
-          onChange={handleEditorChange}
-          options={{
-            minimap: {
-              enabled: false,
-            },
-            fontSize: 18,
-            lineNumbers: "on",
-            rulers: [],
-            wordWrap: "off",
-            folding: true,
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-          }}
-        />
+      <div className="flex-1 bg-[#0c0c0c] overflow-y-scroll p-4">
+        {result.output && (
+          <div className="text-sm text-foreground whitespace-pre-wrap">
+            {result.output}
+          </div>
+        )}
+        {result.error && (
+          <div className="text-sm text-red-500 whitespace-pre-wrap">
+            {result.error}
+          </div>
+        )}
       </div>
-      <div className="rounded-b-xl bg-secondary/80 border-t min-h-10 h-10 flex items-center justify-between px-4">
-        <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <div className="bg-green-500 rounded-full w-2 h-2" /> saved
-        </span>
-      </div>
+      <div className="bg-secondary/80 rounded-b-xl border-t min-h-10 h-10"></div>
     </div>
   );
 }
