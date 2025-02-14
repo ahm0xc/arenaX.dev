@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import type { PyodideInterface } from "pyodide";
 
@@ -7,11 +9,13 @@ import { initPyodide, runPython } from "~/lib/utils";
 
 interface PythonEditorProps {
   initialCode: string;
-  onResult: (result: { output: string | null; error: string | null }) => void;
+  validations: string[];
+  onResult?: (result: { output: string | null; error: string | null }) => void;
 }
 
 export default function PythonEditor({
   initialCode,
+  validations,
   onResult,
 }: PythonEditorProps) {
   const [isRunning, setIsRunning] = React.useState(false);
@@ -31,8 +35,16 @@ export default function PythonEditor({
 
     setIsRunning(true);
     const result = await runPython(code, pyodide.current);
-    console.log("🚀 ~ onRun ~ result:", result);
-    onResult(result);
+    onResult?.(result);
+
+    if (validations.length > 0) {
+      const validationResult = await runPython(
+        code + "\n" + validations.join("\n"),
+        pyodide.current
+      );
+      console.log(validationResult);
+    }
+
     setIsRunning(false);
   }
 

@@ -1,6 +1,8 @@
 import { allExercises } from "exercises";
 import { notFound } from "next/navigation";
 
+import Editor from "./editor";
+
 interface PageProps {
   params: Promise<{
     category: string;
@@ -10,8 +12,7 @@ interface PageProps {
 
 export default async function ExercisePage(props: PageProps) {
   const { category, exerciseId } = await props.params;
-  console.log("🚀 ~ ExercisePage ~ category:", category);
-  console.log("🚀 ~ ExercisePage ~ exerciseId:", exerciseId);
+
   const exercise = getExercise(category, exerciseId);
   if (!exercise) {
     notFound();
@@ -19,9 +20,7 @@ export default async function ExercisePage(props: PageProps) {
 
   return (
     <div>
-      <h1>{exercise.title}</h1>
-      <p>{exercise.description}</p>
-      <p>{exercise.initialCode}</p>
+      <Editor exercise={exercise} />
     </div>
   );
 }
