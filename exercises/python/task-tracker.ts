@@ -3,6 +3,9 @@ import type { Exercise } from "~/types";
 const taskTracker: Exercise = {
   id: "task-tracker",
   title: "Task Tracker",
+  category: "python",
+  createdAt: new Date("2025-02-6"),
+  difficulty: "beginner",
   description: `Task tracker is a project used to track and manage your tasks. In this task, you will build a simple command line interface (CLI) to track what you need to do, what you have done, and what you are currently working on. This project will help you practice your programming skills, including working with the filesystem, handling user inputs, and building a simple CLI application.
 
 ## Requirements
@@ -79,6 +82,7 @@ def list_tasks_by_status(status):
 def main():
     pass
 `,
+  validations: [],
 };
 
 export default taskTracker;

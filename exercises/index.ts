@@ -1,13 +1,18 @@
-import taskTracker from "./python/task-tracker";
+import type { Exercise } from "~/types";
 
-export const javascriptExercises = [];
+import * as exercisesJavascript from "./javascript";
+import * as exercisesPython from "./python";
 
-export const pythonExercises = [taskTracker];
+export const javascriptExercises: Exercise[] = [
+  ...Object.values(exercisesJavascript),
+];
 
-export const reactExercises = [];
+export const pythonExercises: Exercise[] = [...Object.values(exercisesPython)];
 
-export const allExercises = [
-  ...javascriptExercises,
+export const reactExercises: Exercise[] = [];
+
+export const allExercises: Exercise[] = [
   ...pythonExercises,
+  ...javascriptExercises,
   ...reactExercises,
 ];
