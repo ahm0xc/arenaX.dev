@@ -60,8 +60,6 @@ export function CourseLayout({ children }: { children: ReactNode }) {
           },
         },
       }}
-      // TODO: add banner
-      // banner: <div className="flex items-center justify-between">hello</div>,
     >
       {children}
     </DocsLayout>
