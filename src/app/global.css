@@ -77,6 +77,10 @@ html {
   --color-fd-primary: var(--html-color);
 }
 
+.css {
+  --color-fd-primary: var(--css-color);
+}
+
 .python {
   --color-fd-primary: var(--python-color);
 }
@@ -84,6 +88,7 @@ html {
 :root {
   --general-color: hsl(0, 0%, 9%);
   --html-color: hsl(0 73.7% 41.8%);
+  --css-color: hsl(270, 50%, 40%);
   --python-color: hsl(32.1 94.6% 43.7%);
 }
 
