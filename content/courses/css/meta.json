@@ -3,5 +3,5 @@
   "description": "A styling language for HTML documents",
   "icon": "CSS",
   "root": true,
-  "pages": ["index"]
+  "pages": ["index", "editor-setup"]
 }

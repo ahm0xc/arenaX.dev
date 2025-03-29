@@ -100,6 +100,7 @@ body {
 .dark {
   --general-color: hsl(0 0% 100%);
   --html-color: hsl(0 84.2% 60.2%);
+  --css-color: hsl(270, 50%, 55%);
   --python-color: hsl(43.3 96.4% 56.3%);
 
   /* --color-fd-background: hsl(0 0% 3%); */
